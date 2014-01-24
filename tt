@@ -1,2 +1,14 @@
 444 599 217
-axd676
+t99mh1
+
+
+$uri = trim($_SERVER['REQUEST_URI'], '/');
+    $uri = str_replace('cpa/profile/','profile/',$uri); // Make it work on BETA site.
+    $uri = str_replace('cpa/company/','company/',$uri); // Make it work on BETA site.
+	$url_array = explode('/', $uri);
+
+	$actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	$baseurl_len = strlen(BASE_URL);
+	$cropped_url = substr($actual_link, $baseurl_len);
+
+	echo $cropped_url;exit;
