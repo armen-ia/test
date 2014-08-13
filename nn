@@ -1,0 +1,34 @@
+function GetPersonProfile($id) {
+	global $model;
+	$app = \Slim\Slim::getInstance();
+    $request = $app->request();
+    $login = json_decode($request->getBody()); // $request->getBody() is not a json string.
+	$login = trim_object($login); // trim object all properties
+	checkAuth('person.profile');
+    try {
+        $person = $model->getPersonDetailsById($id);
+        $person['media'] = $model->getUserMediaDetailsById($id);
+		var_dump($person);exit;
+        if ($person["profile"][0]["idPerson"] > 0 && $id>0) {
+			$isLoggedIn = isLoggedIn($login->idPerson, $login->securityKey);		
+			$data_to_return = array();
+			if ($isLoggedIn) {
+				$data_to_return = $person;
+			}else{
+					$data_to_return['profile'][0]['perFirstName']       = $person['profile'][0]['perFirstName'];
+					$data_to_return['profile'][0]['perSecondName']      = $person['profile'][0]['perSecondName'];
+					$data_to_return['profile'][0]['perLastName']        = $person['profile'][0]['perLastName'];
+					$data_to_return['profile'][0]['perSecondLastName']  = $person['profile'][0]['perSecondLastName'];
+					$data_to_return['profile'][0]['idPerson']           = $person['profile'][0]['idPerson'];
+					$data_to_return['media'][0]['perImages']            = $person['media'][0]['perImages'];
+			}
+
+            $response = array('status' => 200, 'error' => false, 'message' => 'Person found', 'person' => $data_to_return);
+        } else {
+            $response = array('status' => 200, 'error' => true, 'message' => 'Person not found');
+        }
+        Response($response);
+    } catch (PDOException $e) {
+        echo '{"error":{"text":' . $e->getMessage() . '}}';
+    }
+}
